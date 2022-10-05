@@ -5,19 +5,18 @@ using namespace std;
 
 BigDecimalInt::BigDecimalInt(const string& num) {
     bool valid= true;
+    bool leadingZero = true;
     if(num[0] != '+' && num[0] != '-' && !isdigit(num[0]))
     {
         valid = false;
     }
     else
     {
-        bool leadingZero = true;
         if(isdigit(num[0]) && num[0] != '0')
         {
             digits.push_back(num[0]);
             leadingZero = false;
         }
-
         for (int i = 1; i <num.size() ; ++i) {
             if(num[i] == '0' && leadingZero)
             {
@@ -33,12 +32,11 @@ BigDecimalInt::BigDecimalInt(const string& num) {
             digits.push_back(num[i]);
 
         }
-
     }
-    if(!valid)
+    if(!valid||leadingZero)
     {
         digits.push_back('0');
-        setSign('0');
+        setSign('+');
     }
     else{
         setSign(num[0]);
@@ -50,7 +48,7 @@ BigDecimalInt::BigDecimalInt(const int & num) {
     if(num==0)
     {
         digits.push_back('0');
-        setSign('0');
+        setSign('+');
     }
     else if(num<0)
     {
@@ -80,18 +78,14 @@ char BigDecimalInt::getSign() const {
 
 
 
-void BigDecimalInt::setSign(char num) {
-    if(!isdigit(num))
+void BigDecimalInt::setSign(const char& sign) {
+    if(!isdigit(sign))
     {
-        sign = num;
-    }
-    else if(num!='0')
-    {
-        sign = '+';
+        this->sign = sign;
     }
     else
     {
-        sign = '0';
+        this->sign = '+';
     }
 }
 
@@ -108,77 +102,87 @@ BigDecimalInt& BigDecimalInt::operator=(const BigDecimalInt &num) {
 }
 
 BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
-
+    if(this->getSign() != num.getSign())
+    {
+        //return *this-num;
+        cout<<"MINUS\n";
+        exit(0);
+    }
     int carry = 0 ;
     int leftIdx = this->getSize() - 1;
     int rightIdx = num.getSize() - 1;
 
     BigDecimalInt result;
     result.digits.clear();
-    if(this->getSign() == num.getSign())
+    while (leftIdx >= 0 && rightIdx >= 0)
     {
-        while (leftIdx >= 0 && rightIdx >= 0)
+        int d1 =  this->digits[leftIdx] - '0';
+        int d2 =  num.digits[rightIdx] - '0';
+        int sum = d1+d2+carry;
+        if(sum>9)
         {
-            int d1 =  this->digits[leftIdx] - '0';
-            int d2 =  num.digits[rightIdx] - '0';
-            int sum = d1+d2+carry;
-            if(sum>9)
-            {
-                carry = 1;
-                sum%=10;
-            }
-            else
-            {
-                carry = 0;
-            }
-            result.digits.push_front(sum + '0');
-            leftIdx--;
-            rightIdx--;
+            carry = 1;
+            sum%=10;
         }
-        while (leftIdx >= 0)
+        else
         {
-            int d1 = this->digits[leftIdx] - '0';
-            int sum = d1+carry;
-            if(sum>9)
-            {
-                carry = 1;
-                sum%=10;
-            }
-            else
-            {
-                carry = 0;
-            }
-            result.digits.push_front(sum + '0');
-            leftIdx--;
+            carry = 0;
         }
-        while (rightIdx >=0)
-        {
-            int d1 = num.digits[rightIdx] - '0';
-            int sum = d1+carry;
-            if(sum>9)
-            {
-                carry = 1;
-                sum%=10;
-            }
-            else
-            {
-                carry = 0;
-            }
-            result.digits.push_front(sum + '0');
-            rightIdx--;
-        }
-        if(carry)
-        {
-            result.digits.push_front(carry + '0');
-        }
-        result.setSign(result.digits[0]);
+        result.digits.push_front(sum + '0');
+        leftIdx--;
+        rightIdx--;
     }
-    else
+    while (leftIdx >= 0)
     {
-        //return *this-num;
+        int d1 = this->digits[leftIdx] - '0';
+        int sum = d1+carry;
+        if(sum>9)
+        {
+            carry = 1;
+            sum%=10;
+        }
+        else
+        {
+            carry = 0;
+        }
+        result.digits.push_front(sum + '0');
+        leftIdx--;
     }
+    while (rightIdx >=0)
+    {
+        int d1 = num.digits[rightIdx] - '0';
+        int sum = d1+carry;
+        if(sum>9)
+        {
+            carry = 1;
+            sum%=10;
+        }
+        else
+        {
+            carry = 0;
+        }
+        result.digits.push_front(sum + '0');
+        rightIdx--;
+    }
+    if(carry)
+    {
+        result.digits.push_front(carry + '0');
+    }
+    result.setSign(this->getSign());
     return  result;
 }
+
+
+BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num) const {
+    if(this->getSign() != num.getSign())
+    {
+        BigDecimalInt temp(num);
+        temp.setSign(this->getSign());
+        return *this+temp;
+    }
+
+}
+
 
 ostream& operator<<(ostream& out,const BigDecimalInt& bigint) {
     if(bigint.getSign()=='-')
@@ -190,7 +194,22 @@ ostream& operator<<(ostream& out,const BigDecimalInt& bigint) {
     return out;
 }
 
-bool BigDecimalInt::operator< (BigDecimalInt anotherDec)const{
+bool BigDecimalInt::operator< (const BigDecimalInt& anotherDec)const{
+    if(this->getSign()=='-'&&anotherDec.getSign()=='+')
+        return true;
+
+    if(this->getSign()=='+'&&anotherDec.getSign()=='-')
+        return false;
+
+    if(this->getSign()=='-' && anotherDec.getSign()=='-')
+    {
+        BigDecimalInt LHS = *this;
+        LHS.setSign('+');
+        BigDecimalInt RHS = anotherDec;
+        RHS.setSign('+');
+        return (LHS>RHS);
+    }
+
     if(this->getSize() < anotherDec.getSize()){
         return true;
     }
@@ -206,7 +225,22 @@ bool BigDecimalInt::operator< (BigDecimalInt anotherDec)const{
     return false;
 }
 
-bool BigDecimalInt::operator> (BigDecimalInt anotherDec)const{
+bool BigDecimalInt::operator> (const BigDecimalInt& anotherDec)const{
+    if(this->getSign()=='-' && anotherDec.getSign()=='+')
+        return false;
+
+    if(this->getSign()=='+' && anotherDec.getSign()=='-')
+        return true;
+
+    if(this->getSign()=='-' && anotherDec.getSign()=='-')
+    {
+        BigDecimalInt LHS = *this;
+        LHS.setSign('+');
+        BigDecimalInt RHS = anotherDec;
+        RHS.setSign('+');
+        return (LHS<RHS);
+    }
+
     if(this->getSize() < anotherDec.getSize()){
         return false;
     }
@@ -222,6 +256,7 @@ bool BigDecimalInt::operator> (BigDecimalInt anotherDec)const{
     return false;
 }
 
-bool operator==(BigDecimalInt& anotherDec)const{
+bool BigDecimalInt::operator==(const BigDecimalInt& anotherDec)const{
     return (!(*this < anotherDec) && !(*this > anotherDec));
 }
+
