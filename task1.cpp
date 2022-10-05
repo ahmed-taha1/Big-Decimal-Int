@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include "task1_source.cpp"
+#include "task1.h"
 using namespace std;
 
 

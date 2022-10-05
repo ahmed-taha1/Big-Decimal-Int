@@ -4,10 +4,16 @@ using namespace std;
 
 class BigDecimalInt {
     private:
-    string num;
+    deque <char> num;
 
     public:
     BigDecimalInt (string temp_num);
-    friend::ostream & operator<<(ostream &os, BigDecimalInt& rec);
+    BigDecimalInt (int decInt);
+    friend::ostream & operator<<(ostream &os, BigDecimalInt& temp_num);
+    BigDecimalInt operator+ (BigDecimalInt anotherDec);
+    bool operator< (BigDecimalInt anotherDec);
+    bool operator> (BigDecimalInt anotherDec);
+    bool operator==(BigDecimalInt anotherDec);
+    friend::ostream& operator << (ostream& out, BigDecimalInt b);
 };
 
