@@ -1,6 +1,7 @@
 #ifndef ASSIGNMENT_1_BIGDECIMALINT_H
 #define ASSIGNMENT_1_BIGDECIMALINT_H
-#include <bits/stdc++.h>
+
+//#include <bits/stdc++.h>
 #include <iostream>
 #include<deque>
 
@@ -22,11 +23,12 @@ public:
     bool operator< (const BigDecimalInt& anotherDec)const;
     bool operator> (const BigDecimalInt& anotherDec)const;
     bool operator==(const BigDecimalInt& anotherDec)const;
-
 private:
     deque<char> digits;
     char sign;
     void setSign(const char &sign);
+    void validate(const string &num);
+
 };
 
 
