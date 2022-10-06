@@ -10,7 +10,7 @@ using namespace std;
 class BigDecimalInt {
     friend ostream& operator<<(ostream& out,const BigDecimalInt& bigint);
 public:
-    BigDecimalInt(const string& num);
+    BigDecimalInt(const string& num); // 
     BigDecimalInt(const int& num=0);
     BigDecimalInt(const BigDecimalInt& num);
 
@@ -27,7 +27,7 @@ private:
     deque<char> digits;
     char sign;
     void setSign(const char &sign);
-    void validate(const string &num);
+    void validate(const string &num); // helper /utility function
 
 };
 
