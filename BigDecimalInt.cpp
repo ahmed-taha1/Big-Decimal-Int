@@ -246,7 +246,7 @@ BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num)const{
 
 
 
-// ******************************* Less Than Check Function *****************************
+// ******************************** Less Than Check Function *****************************
 
 
 bool BigDecimalInt::operator< (const BigDecimalInt& anotherDec)const{
