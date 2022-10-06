@@ -1,39 +1,25 @@
-
-
 #include "BigDecimalInt.h"
 using namespace std;
+
 
 BigDecimalInt::BigDecimalInt(const string& num) {
     bool valid= true;
     bool leadingZero = true;
-    if(num[0] != '+' && num[0] != '-' && !isdigit(num[0]))
-    {
+    if (! regex_match(num, regex("(\\+|-)?\\d+") ) )
         valid = false;
-    }
-    else
-    {
-        if(isdigit(num[0]) && num[0] != '0')
-        {
+    else {
+        if(isdigit(num[0]) && num[0] != '0') {
             digits.push_back(num[0]);
             leadingZero = false;
         }
         for (int i = 1; i <num.size() ; ++i) {
             if(num[i] == '0' && leadingZero)
-            {
                 continue;
-            }
-            if(!isdigit(num[i]))
-            {
-                valid = false;
-                break;
-            }
-
             leadingZero = false;
             digits.push_back(num[i]);
-
         }
     }
-    if(!valid||leadingZero)
+    if(!valid || leadingZero)
     {
         digits.push_back('0');
         setSign('+');
@@ -42,6 +28,7 @@ BigDecimalInt::BigDecimalInt(const string& num) {
         setSign(num[0]);
     }
 }
+
 
 BigDecimalInt::BigDecimalInt(const int & num) {
     int temp=num;
