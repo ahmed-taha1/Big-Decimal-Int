@@ -1,4 +1,4 @@
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
 #include <regex>
 #include "BigDecimalInt.h"
 using namespace std;
@@ -8,30 +8,23 @@ using namespace std;
 
 
 BigDecimalInt::BigDecimalInt(const string& num) {
-    bool valid= true;
-    bool leadingZero = true;
-    if (! regex_match(num, regex("(\\+|-)?\\d+") ) )
-        valid = false;
-    else {
-        if(isdigit(num[0]) && num[0] != '0') {
-            digits.push_back(num[0]);
-            leadingZero = false;
-        }
-        for (int i = 1; i <num.size() ; ++i) {
-            if(num[i] == '0' && leadingZero)
-                continue;
-            leadingZero = false;
-            digits.push_back(num[i]);
-        }
+    // validating (leading zeros ,sign ,etc....)
+    validate(num);
+}
+
+
+
+// ***************************** Copy Constructor ***************************************
+BigDecimalInt::BigDecimalInt(const BigDecimalInt &other) {
+    // extracting  digits
+    string num ;
+    for (int i = 0; i <other.getSize(); ++i) {
+        num+=other.digits[i];
     }
-    if(!valid || leadingZero)
-    {
-        digits.push_back('0');
-        setSign('+');
-    }
-    else{
-        setSign(num[0]);
-    }
+
+    // validating (leading zeros ,sign ,etc....)
+    validate(num);
+    setSign(other.getSign());
 }
 
 
@@ -49,7 +42,6 @@ BigDecimalInt::BigDecimalInt(const int & num) {
     {
         setSign('-');
         temp*=-1;
-
     }
     else
     {
@@ -64,6 +56,19 @@ BigDecimalInt::BigDecimalInt(const int & num) {
 }
 
 
+// ******************************* Assign Operator Function *****************************
+
+
+BigDecimalInt& BigDecimalInt::operator=(const BigDecimalInt &num) {
+    this->digits.clear();
+    this->setSign(num.getSign());
+    for (int i = 0; i <num.getSize(); ++i) {
+        digits.push_back(num.digits[i]);
+    }
+    return *this;
+}
+
+
 // ******************************* Size Getter Function *****************************
 
 
@@ -73,7 +78,6 @@ int BigDecimalInt::getSize() const {
 
 
 // ******************************* Sign Getter Function *****************************
-
 
 char BigDecimalInt::getSign() const {
     return  sign;
@@ -94,25 +98,6 @@ void BigDecimalInt::setSign(const char& sign) {
 }
 
 
-// ***************************** Constructor Assign to Another Class Member *******************************
-
-
-BigDecimalInt::BigDecimalInt(const BigDecimalInt &other) {
-    *this = other;
-}
-
-
-// ******************************* Assign Operator Function *****************************
-
-
-BigDecimalInt& BigDecimalInt::operator=(const BigDecimalInt &num) {
-    this->digits.clear();
-    for (int i = 0; i <num.getSize(); ++i) {
-        digits.push_back(num.digits[i]);
-    }
-    return *this;
-}
-
 
 // ******************************** Addition Function ****************************
 
@@ -120,9 +105,9 @@ BigDecimalInt& BigDecimalInt::operator=(const BigDecimalInt &num) {
 BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
     if(this->getSign() != num.getSign())
     {
-        //return *this-num;
-        cout<<"MINUS\n";
+        return *this-num;
     }
+
     int carry = 0 ;
     int leftIdx = this->getSize() - 1;
     int rightIdx = num.getSize() - 1;
@@ -188,18 +173,77 @@ BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
 }
 
 
-// ****************************** Output Operator Overloading Function ******************************
+
+// ***************************** Subtraction Function *******************************
 
 
-ostream& operator<<(ostream& out,const BigDecimalInt& bigint) {
-    if(bigint.getSign()=='-')
-        out<<'-';
-
-    for (int i = 0; i <bigint.getSize(); ++i) {
-        out<<bigint.digits[i];
+BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num)const{
+    // call sum operator
+    if(this->getSign() != num.getSign())
+    {
+        BigDecimalInt temp(num);
+        temp.setSign(this-> getSign());
+        return *this+temp;
     }
-    return out;
+
+    BigDecimalInt result,bigger,smaller,lhs,rhs;
+    result.digits.clear();
+
+    lhs = *this;
+    char lhsSign = lhs.getSign();// save old sign
+    lhs.setSign('+'); // get abs value
+
+    rhs = num;
+    if(rhs.getSign()=='+') // flip sign
+        rhs.setSign('-');
+    else
+        rhs.setSign('+');
+
+    char rhsSign = rhs.getSign();// save old sign
+    rhs.setSign('+');// get abs value
+
+    if(lhs>rhs)
+    {
+        result.setSign(lhsSign);
+        bigger = lhs;
+        smaller = rhs;
+    }
+    else if(rhs>lhs)
+    {
+        result.setSign(rhsSign);
+        bigger = rhs;
+        smaller = lhs;
+    }
+    else
+    {
+        result.setSign('+');
+        return BigDecimalInt("0");
+    }
+
+     // equate the sizes of the two numbers
+    int diff = abs(bigger.getSize()-smaller.getSize());
+    for (int i = 0; i <diff; ++i) {
+        if(smaller.getSize()<bigger.getSize())
+              smaller.digits.push_front('0');
+        else
+            bigger.digits.push_front('0');
+    }
+
+    // subtraction
+    for (int i =  bigger.getSize()-1 ; i >= 0; i--) {
+        if(bigger.digits[i] < smaller.digits[i]) {
+            bigger.digits[i-1]--;
+            bigger.digits[i] += 10;
+            result.digits.push_front('0' + bigger.digits[i] - smaller.digits[i]);
+        }
+        else {
+            result.digits.push_front('0' + bigger.digits[i] - smaller.digits[i]);
+        }
+
+    }
+     return result;
 }
+
 
 
 // ******************************* Less Than Check Function *****************************
@@ -279,55 +323,44 @@ bool BigDecimalInt::operator==(const BigDecimalInt& anotherDec) const {
     return (!(*this < anotherDec) && !(*this > anotherDec));
 }
 
+// ****************************** Output Operator Overloading Function ******************************
 
-// ***************************** Subtraction Function *******************************
 
+ostream& operator<<(ostream& out,const BigDecimalInt& bigint) {
+    if(bigint.getSign()=='-')
+        out<<'-';
 
-BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num) const {
-    if(this->getSign() != num.getSign())
-    {
-        BigDecimalInt temp(num);
-        temp.setSign(this-> getSign());
-        return *this+temp;
+    for (int i = 0; i <bigint.getSize(); ++i) {
+        out<<bigint.digits[i];
     }
-    // "124"
-    // "012"
-    BigDecimalInt result;
-    result.digits.clear();
-    // BigDecimalInt bigger = max(*this, num);
-    // BigDecimalInt smaller = min(*this, num);
-    if(this->getSize() > num.getSize() || ( this->getSize() == num.getSize() && (*this > num  || *this == num) ) )
-    {
-        // leading zeros to make their size equal 
-        BigDecimalInt num2;
-        num2.digits.clear();
-        for (int i = 0; i < this->getSize() - num.getSize(); i++){
-            num2.digits.push_back('0');
+    return out;
+}
+
+// ****************************** Validating number **************************************************
+
+void BigDecimalInt::validate(const string &num){
+    bool valid = true;
+    bool leadingZero = true;
+    if (! regex_match(num, regex("(\\+|-)?\\d+") ) )
+        valid = false;
+    else {
+        if(isdigit(num[0]) && num[0] != '0') {
+            digits.push_back(num[0]);
+            leadingZero = false;
         }
-        for (char i : num.digits)
-            num2.digits.push_back(i);
-
-        // copy num 1
-        BigDecimalInt num1 = *this;
-
-        // sub
-        for (int i =  num2.getSize() - 1 ; i >= 0; i--) {
-            if(num1.digits[i] < num2.digits[i]) {
-                num1.digits[i-1]--;
-                num1.digits[i] += 10;
-                result.digits.push_front('0' + num1.digits[i] - num2.digits[i]);
-            }
-            else {
-                result.digits.push_front('0' + num1.digits[i] - num2.digits[i]);
-            }
+        for (int i = 1; i <num.size() ; ++i) {
+            if(num[i] == '0' && leadingZero)
+                continue;
+            leadingZero = false;
+            digits.push_back(num[i]);
         }
     }
-    else
+    if(!valid || leadingZero)
     {
-        // ***************** bug ******************
-        // cout << "-";
-        result.setSign('-');
-        return num - *this;
+        digits.push_back('0');
+        setSign('+');
     }
-    return result;
+    else{
+        setSign(num[0]);
+    }
 }
