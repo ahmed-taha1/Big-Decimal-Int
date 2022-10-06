@@ -16,6 +16,7 @@ BigDecimalInt::BigDecimalInt(const string& num) {
 
 // ***************************** Copy Constructor ***************************************
 BigDecimalInt::BigDecimalInt(const BigDecimalInt &other) {
+
     // extracting  digits
     string num ;
     for (int i = 0; i <other.getSize(); ++i) {
@@ -108,16 +109,29 @@ BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
         return *this-num;
     }
 
-    int carry = 0 ;
-    int leftIdx = this->getSize() - 1;
-    int rightIdx = num.getSize() - 1;
-
     BigDecimalInt result;
     result.digits.clear();
-    while (leftIdx >= 0 && rightIdx >= 0)
+    result.setSign(this->getSign());
+
+    BigDecimalInt lhs = *this;
+    BigDecimalInt rhs = num;
+
+    // equate the sizes of the two numbers
+    int diff = abs(lhs.getSize()-rhs.getSize());
+    for (int i = 0; i <diff; ++i) {
+        if(rhs.getSize()<lhs.getSize())
+            rhs.digits.push_front('0');
+        else
+            lhs.digits.push_front('0');
+    }
+
+    int end = lhs.getSize()-1;
+    int carry = 0 ;
+
+    while (end>=0)
     {
-        int d1 =  this->digits[leftIdx] - '0';
-        int d2 =  num.digits[rightIdx] - '0';
+        int d1 =  lhs.digits[end] - '0';
+        int d2 =  rhs.digits[end] - '0';
         int sum = d1+d2+carry;
         if(sum>9)
         {
@@ -129,46 +143,12 @@ BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
             carry = 0;
         }
         result.digits.push_front(sum + '0');
-        leftIdx--;
-        rightIdx--;
-    }
-    while (leftIdx >= 0)
-    {
-        int d1 = this->digits[leftIdx] - '0';
-        int sum = d1+carry;
-        if(sum>9)
-        {
-            carry = 1;
-            sum%=10;
-        }
-        else
-        {
-            carry = 0;
-        }
-        result.digits.push_front(sum + '0');
-        leftIdx--;
-    }
-    while (rightIdx >=0)
-    {
-        int d1 = num.digits[rightIdx] - '0';
-        int sum = d1+carry;
-        if(sum>9)
-        {
-            carry = 1;
-            sum%=10;
-        }
-        else
-        {
-            carry = 0;
-        }
-        result.digits.push_front(sum + '0');
-        rightIdx--;
+        end--;
     }
     if(carry)
     {
         result.digits.push_front(carry + '0');
     }
-    result.setSign(this->getSign());
     return  result;
 }
 
@@ -246,7 +226,7 @@ BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num)const{
 
 
 
-// ******************************** Less Than Check Function *****************************
+// ******************************* Less Than Check Function *****************************
 
 
 bool BigDecimalInt::operator< (const BigDecimalInt& anotherDec)const{
@@ -364,3 +344,5 @@ void BigDecimalInt::validate(const string &num){
         setSign(num[0]);
     }
 }
+
+// ********************************************************************************************
