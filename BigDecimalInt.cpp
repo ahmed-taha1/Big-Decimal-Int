@@ -12,8 +12,6 @@ BigDecimalInt::BigDecimalInt(const string& num) {
     validate(num);
 }
 
-
-
 // ***************************** Copy Constructor ***************************************
 BigDecimalInt::BigDecimalInt(const BigDecimalInt &other) {
 
@@ -45,7 +43,7 @@ BigDecimalInt::BigDecimalInt(const int & num) {
     else
         setSign('+');
     while(temp) {
-        int digit=num%10;
+        int digit=temp%10;
         temp/=10;
         digits.push_front(digit + '0');
     }
@@ -58,7 +56,7 @@ BigDecimalInt::BigDecimalInt(const int & num) {
 BigDecimalInt& BigDecimalInt::operator=(const BigDecimalInt &num) {
     this->digits.clear(); // clear the object
     this->setSign(num.getSign()); // copy the sign
-    // copy the digits 
+    // copy the digits
     for (char i : num.digits) {
         digits.push_back(i);
     }
@@ -98,7 +96,7 @@ void BigDecimalInt::setSign(const char& sign) {
 
 
 BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
-    // if they not have the same signs change the operate to subtract 
+    // if they not have the same signs change the operate to subtract
     // (1 + -2) == (1 - 2)
     if(this->getSign() != num.getSign()){
         BigDecimalInt temp(num);
@@ -135,7 +133,7 @@ BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
             // take the last digit to add it to the object
             sum%=10;
         }
-        else 
+        else
             carry = 0;
         // push the sum to to object
         result.digits.push_front(sum + '0');
@@ -190,7 +188,7 @@ BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num)const{
         smaller = lhs;
     }
     else { // if they are equal return 0 (50 - 50) = 0
-        result.setSign('+');  
+        result.setSign('+');
         return BigDecimalInt("0");
     }
 
@@ -198,26 +196,23 @@ BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num)const{
     int diff = abs(bigger.getSize()-smaller.getSize());
     for (int i = 0; i < diff; ++i) {
         if(smaller.getSize() < bigger.getSize())
-              smaller.digits.push_front('0');
+            smaller.digits.push_front('0');
         else
             bigger.digits.push_front('0');
     }
 
     // subtraction
+
     for (int i =  bigger.getSize()-1 ; i >= 0; i--) {
-        // if the bigger's number digit less than the smaller's number digit borrow from it's left neighbor one  
+        // if the bigger's number digit less than the smaller's number digit borrow from it's left neighbor one
         if(bigger.digits[i] < smaller.digits[i]) {
             bigger.digits[i-1]--;
             bigger.digits[i] += 10;
-            // subtract them and store the result in the object
-            result.digits.push_front('0' + bigger.digits[i] - smaller.digits[i]);
         }
-        else { // else subtract them and store the result in the object
-            result.digits.push_front('0' + bigger.digits[i] - smaller.digits[i]);
-        }
-
+        // subtract them and store the result in the object
+        result.digits.push_front('0' + bigger.digits[i] - smaller.digits[i]);
     }
-     return result;
+    return result;
 }
 
 
@@ -265,7 +260,7 @@ bool BigDecimalInt::operator< (const BigDecimalInt& anotherDec)const{
 
 bool BigDecimalInt::operator> (const BigDecimalInt& anotherDec)const{
     // if the first number have a negative sign and the second number have positive sign function will return false
-    if(this->getSign()=='-' && anotherDec.getSign()=='+') 
+    if(this->getSign()=='-' && anotherDec.getSign()=='+')
         return false;
     // if the first number have a positive sign and the second number have negative sign function will return true
     if(this->getSign()=='+' && anotherDec.getSign()=='-')
@@ -329,7 +324,7 @@ void BigDecimalInt::validate(const string &num){
     // check if sign exist only once or not and check if the string contain numbers only using regex
     if (! regex_match(num, regex("(\\+|-)?\\d+") ) )
         valid = false;
-    // push back the numbers into the object and skip zeros in the left
+        // push back the numbers into the object and skip zeros in the left
     else {
         if(isdigit(num[0]) && num[0] != '0') {
             digits.push_back(num[0]);
@@ -347,7 +342,7 @@ void BigDecimalInt::validate(const string &num){
         digits.push_back('0');
         setSign('+');
     }
-    // set number's sign if valid using setSign function
+        // set number's sign if valid using setSign function
     else
         setSign(num[0]);
 }
