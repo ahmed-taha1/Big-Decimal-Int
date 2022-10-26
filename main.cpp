@@ -1,5 +1,13 @@
+/*
+Names : Ahmed mohamed taha, adham tarek, ismail magdy
+ID   : 20210033 - 20210051 - 20210069
+task : group task 1 - assignment 1
+last date modified : 10/20/2022
+Description : this program is doing some operations in a big decimal integers which that normal data types can't store
+*/
+
 #include <bits/stdc++.h>
-#include "BigDecimalInt.cpp"
+#include "BigDecimalInt.h"
 using namespace std;
 
 int main(){
@@ -47,5 +55,4 @@ int main(){
         cout << "invalid input please try again!\n";
         goto choose;
     }
-        
 }
