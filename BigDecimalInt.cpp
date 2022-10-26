@@ -1,16 +1,14 @@
-//#include <bits/stdc++.h>
-#include <regex>
+#include <bits/stdc++.h>
 #include "BigDecimalInt.h"
 using namespace std;
 
 
 // ******************************** String Constructor ****************************
-
-
 BigDecimalInt::BigDecimalInt(const string& num) {
     // validating (leading zeros ,sign ,etc....)
     validate(num);
 }
+
 
 // ***************************** Copy Constructor ***************************************
 BigDecimalInt::BigDecimalInt(const BigDecimalInt &other) {
@@ -28,8 +26,6 @@ BigDecimalInt::BigDecimalInt(const BigDecimalInt &other) {
 
 
 // ******************************** Int Constructor ****************************
-
-
 BigDecimalInt::BigDecimalInt(const int & num) {
     int temp=num;
     if(num==0) {
@@ -51,8 +47,6 @@ BigDecimalInt::BigDecimalInt(const int & num) {
 
 
 // ******************************* Assign "=" Operator Function *****************************
-
-
 BigDecimalInt& BigDecimalInt::operator=(const BigDecimalInt &num) {
     this->digits.clear(); // clear the object
     this->setSign(num.getSign()); // copy the sign
@@ -65,8 +59,6 @@ BigDecimalInt& BigDecimalInt::operator=(const BigDecimalInt &num) {
 
 
 // ******************************* Size Getter Function *****************************
-
-
 int BigDecimalInt::getSize() const {
     // return deque's size
     return  digits.size();
@@ -74,14 +66,12 @@ int BigDecimalInt::getSize() const {
 
 
 // ******************************* Sign Getter Function *****************************
-
 char BigDecimalInt::getSign() const {
     return  sign;
 }
 
+
 // ******************************** Sign Setter Function ****************************
-
-
 void BigDecimalInt::setSign(const char& sign) {
     if(!isdigit(sign)) {
         this->sign = sign;
@@ -93,8 +83,6 @@ void BigDecimalInt::setSign(const char& sign) {
 
 
 // ******************************** Addition "+" Function ****************************
-
-
 BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
     // if they not have the same signs change the operate to subtract
     // (1 + -2) == (1 - 2)
@@ -147,8 +135,6 @@ BigDecimalInt BigDecimalInt::operator+(const BigDecimalInt &num)const {
 
 
 // ***************************** Subtraction "-" Function *******************************
-
-
 BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num)const{
     /* call add operator if they have non equal signs and set thier add sign to the first number
        (-3 - 2) = -(3 + 2) || (3 - -6) = (3 + 6)
@@ -218,8 +204,6 @@ BigDecimalInt BigDecimalInt::operator-(const BigDecimalInt &num)const{
 
 
 // ******************************* Less Than "<" Check Function *****************************
-
-
 bool BigDecimalInt::operator< (const BigDecimalInt& anotherDec)const{
     // if the first number have a negative sign and the second number have positive sign function will return true
     if(this->getSign()=='-'&&anotherDec.getSign()=='+')
@@ -256,8 +240,6 @@ bool BigDecimalInt::operator< (const BigDecimalInt& anotherDec)const{
 
 
 // ****************************** Greater Than ">" Check Function ******************************
-
-
 bool BigDecimalInt::operator> (const BigDecimalInt& anotherDec)const{
     // if the first number have a negative sign and the second number have positive sign function will return false
     if(this->getSign()=='-' && anotherDec.getSign()=='+')
@@ -295,16 +277,13 @@ bool BigDecimalInt::operator> (const BigDecimalInt& anotherDec)const{
 
 
 // ****************************** Equality "==" Check Functions******************************
-
-
 bool BigDecimalInt::operator==(const BigDecimalInt& anotherDec) const {
     // if the first not greater than the second and not less than the second that means that the two numbers are equal
     return (!(*this < anotherDec) && !(*this > anotherDec));
 }
 
+
 // ****************************** Output Operator "<<" Overloading Function ******************************
-
-
 ostream& operator<<(ostream& out,const BigDecimalInt& bigint) {
     // if the object negative from check it's sign output the sign first
     if(bigint.getSign()=='-')
@@ -316,8 +295,8 @@ ostream& operator<<(ostream& out,const BigDecimalInt& bigint) {
     return out;
 }
 
-// ****************************** Validating number **************************************************
 
+// ****************************** Validating number **************************************************
 void BigDecimalInt::validate(const string &num){
     bool valid = true;
     bool leadingZero = true;
